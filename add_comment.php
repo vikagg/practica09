@@ -16,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Проверка на AJAX запрос
 $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
           strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
@@ -36,7 +35,6 @@ if ($postId <= 0 || $content === '') {
     exit;
 }
 
-// Ограничение длины комментария
 if (mb_strlen($content) > 1000) {
     http_response_code(422);
     echo json_encode(['ok' => false, 'message' => 'Комментарий слишком длинный (максимум 1000 символов).']);

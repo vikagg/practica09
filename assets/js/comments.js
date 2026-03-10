@@ -18,35 +18,28 @@ class PostComments {
         this.initFormToggle();
         this.initCharCounter();
         this.initFormSubmit();
-        
-        // Делаем функции доступными глобально
         window.replyToComment = this.replyToComment.bind(this);
         window.deleteComment = this.deleteComment.bind(this);
     }
     
     initFormToggle() {
-        // Показать форму
         if (this.showFormBtn && this.formContainer) {
             this.showFormBtn.addEventListener('click', () => {
                 this.showForm();
             });
         }
         
-        // Скрыть форму (крестик)
         if (this.closeFormBtn && this.formContainer) {
             this.closeFormBtn.addEventListener('click', () => {
                 this.hideForm();
             });
         }
-        
-        // Скрыть форму (кнопка отмены)
         if (this.cancelBtn && this.formContainer) {
             this.cancelBtn.addEventListener('click', () => {
                 this.hideForm();
             });
         }
         
-        // Закрыть форму по ESC
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.formContainer && !this.formContainer.classList.contains('hidden')) {
                 this.hideForm();
@@ -60,7 +53,6 @@ class PostComments {
                 const count = this.textarea.value.length;
                 this.charCountEl.textContent = count;
                 
-                // Меняем цвет при приближении к лимиту
                 if (count > 900) {
                     this.charCountEl.style.color = '#ff8a8a';
                 } else if (count > 800) {
@@ -80,7 +72,6 @@ class PostComments {
             this.showFormBtn.style.display = 'none';
         }
         
-        // Фокус на текстовое поле
         if (this.textarea) {
             setTimeout(() => this.textarea.focus(), 100);
         }
@@ -94,7 +85,6 @@ class PostComments {
             this.showFormBtn.style.display = 'inline-flex';
         }
         
-        // Очистить форму и сообщения
         if (this.form) {
             this.form.reset();
         }
@@ -112,8 +102,6 @@ class PostComments {
     
     async handleSubmit(event) {
         event.preventDefault();
-        
-        // Блокируем кнопку
         if (this.submitButton) {
             this.submitButton.disabled = true;
             this.submitButton.textContent = 'Отправка...';
@@ -142,7 +130,6 @@ class PostComments {
                 throw new Error(data.message || 'Ошибка при добавлении комментария');
             }
             
-            // Успешная отправка
             this.addCommentToTop(data.comment_html);
             this.form.reset();
             if (this.charCountEl) {
@@ -150,7 +137,6 @@ class PostComments {
             }
             this.showMessage('Комментарий добавлен!', 'success');
             
-            // Скрыть форму через 1.5 секунды
             setTimeout(() => {
                 this.hideForm();
             }, 1500);
@@ -159,7 +145,6 @@ class PostComments {
             console.error('PostComments error:', error);
             this.showMessage(error.message || 'Ошибка сети. Попробуйте снова.', 'error');
         } finally {
-            // Разблокируем кнопку
             if (this.submitButton) {
                 this.submitButton.disabled = false;
                 this.submitButton.textContent = 'Отправить комментарий';
@@ -169,26 +154,20 @@ class PostComments {
     
     addCommentToTop(commentHtml) {
         if (!this.commentsList) return;
-        
-        // Удаляем сообщение "нет комментариев" если оно есть
         const noComments = this.commentsList.querySelector('.no-comments');
         if (noComments) {
             noComments.remove();
         }
         
-        // Вставляем новый комментарий в начало списка
         this.commentsList.insertAdjacentHTML('afterbegin', commentHtml);
         
-        // Анимация нового комментария
         const newComment = this.commentsList.firstElementChild;
         if (newComment) {
             newComment.style.animation = 'none';
-            // Форсируем перерисовку
             void newComment.offsetWidth;
             newComment.style.animation = 'fadeIn 0.5s ease';
         }
         
-        // Обновляем счетчик комментариев
         this.updateCommentsCount();
     }
     
@@ -216,8 +195,6 @@ class PostComments {
             this.messageEl.classList.add('error-text');
         } else if (type === 'success') {
             this.messageEl.classList.add('success-text');
-            
-            // Автоматически скрываем сообщение через 5 секунд
             setTimeout(() => {
                 this.fadeOutMessage();
             }, 5000);
@@ -247,7 +224,6 @@ class PostComments {
         }, 500);
     }
     
-    // Глобальная функция для ответа на комментарий
     replyToComment(username) {
         const formContainer = document.getElementById('commentFormContainer');
         const textarea = document.querySelector('.comment-textarea');
@@ -262,18 +238,14 @@ class PostComments {
         if (textarea) {
             textarea.value = `@${username}, `;
             textarea.focus();
-            
-            // Устанавливаем курсор в конец
             const length = textarea.value.length;
             textarea.setSelectionRange(length, length);
             
-            // Обновляем счетчик символов
             const charCount = document.getElementById('charCount');
             if (charCount) {
                 charCount.textContent = length;
             }
             
-            // Обновляем цвет счетчика
             if (length > 900) {
                 charCount.style.color = '#ff8a8a';
             } else if (length > 800) {
@@ -282,10 +254,8 @@ class PostComments {
         }
     }
     
-    // Глобальная функция для удаления комментария
     deleteComment(commentId) {
         if (confirm('Вы уверены, что хотите удалить этот комментарий?')) {
-            // Здесь будет AJAX запрос на удаление
             console.log('Delete comment:', commentId);
             fetch('delete_comment.php', {
                 method: 'POST',
@@ -298,7 +268,6 @@ class PostComments {
             .then(response => response.json())
             .then(data => {
                 if (data.ok) {
-                    // Удаляем комментарий из DOM
                     const commentElement = document.querySelector(`.comment-item[data-comment-id="${commentId}"]`);
                     if (commentElement) {
                         commentElement.remove();
@@ -316,7 +285,6 @@ class PostComments {
     }
 }
 
-// Инициализация после загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
     new PostComments();
 });

@@ -101,7 +101,6 @@ require_once __DIR__ . '/partials/header.php';
             data-csrf="<?= e(csrf_token()) ?>"
             <?= isLoggedIn() ? '' : 'disabled title="Войдите, чтобы поставить лайк"' ?>
         >
-            <span class="icon">❤</span>
             <span class="count"><?= (int)$post['likes_count'] ?></span>
             <span class="label">Нравится</span>
         </button>
